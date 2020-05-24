@@ -1,0 +1,16 @@
+{
+	"state": "production",
+	"organization": "gearboxworks",
+	"name": "php",
+	"version": "7.0.33",
+	"majorversion": "7.0",
+	"latest": "",
+	"class": "processvm",
+	"network": "--network gearboxnet",
+	"ports": "-p 9000:9000",
+	"volumes": "-v /srv/sites:/srv/sites",
+	"restart": "--restart no",
+	"args": "--add-host mailhog:172.42.0.1",
+	"env": "PHP_VERSION"
+}
+

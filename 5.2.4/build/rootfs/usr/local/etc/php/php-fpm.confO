@@ -1,0 +1,58 @@
+<configuration>
+  <section name="global_options">
+    <value name="pid_file">/var/run/php/php-fpm.pid</value>
+    <value name="error_log">/proc/self/fd/2</value>
+    <value name="log_level">notice</value>
+    <value name="emergency_restart_threshold">10</value>
+    <value name="emergency_restart_interval">1m</value>
+    <value name="process_control_timeout">5s</value>
+    <value name="daemonize">no</value>
+  </section>
+  <workers>
+    <section name="pool">
+      <value name="name">default</value>
+      <value name="listen_address">9000</value>
+      <value name="listen_options">
+        <value name="backlog">-1</value>
+        <value name="owner"></value>
+        <value name="group"></value>
+        <value name="mode">0666</value>
+      </value>
+      <value name="php_defines">
+        <value name="sendmail_path">/usr/sbin/sendmail -t -i</value>
+        <value name="display_errors">1</value>
+      </value>
+        <value name="user">gearbox</value>
+        <value name="group">gearbox</value>
+      <value name="pm">
+        <value name="style">static</value>
+        <value name="max_children">16</value>
+        <value name="apache_like">
+          <value name="StartServers">8</value>
+          <value name="MinSpareServers">4</value>
+          <value name="MaxSpareServers">16</value>
+        </value>
+      </value>
+      <value name="request_terminate_timeout">0s</value>
+      <value name="request_slowlog_timeout">0s</value>
+      <value name="slowlog">logs/slow.log</value>
+      <value name="rlimit_files">65535</value>
+      <value name="rlimit_core">0</value>
+      <value name="chroot"></value>
+      <value name="chdir"></value>
+      <value name="catch_workers_output">yes</value>
+      <value name="max_requests">10240</value>
+      <value name="allowed_clients"></value>
+      <value name="environment">
+        <value name="HOSTNAME">$HOSTNAME</value>
+        <value name="PATH">/usr/local/bin:/usr/bin:/bin</value>
+        <value name="TMP">/tmp</value>
+        <value name="TMPDIR">/tmp</value>
+        <value name="TEMP">/tmp</value>
+        <value name="OSTYPE">$OSTYPE</value>
+        <value name="MACHTYPE">$MACHTYPE</value>
+        <value name="MALLOC_CHECK_">2</value>
+      </value>
+    </section>
+  </workers>
+</configuration>

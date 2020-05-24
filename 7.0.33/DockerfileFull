@@ -1,0 +1,58 @@
+# This file is essentially a merge of DockerfileBase & DockerfileTarball
+ARG VERSION="7.0.33"
+
+# 1. First reference the php-base image.
+FROM gearboxworks/php-base:$VERSION as php-base
+
+
+# 2. Now copy the local files specific to this image.
+COPY build /build
+COPY gearbox.json /build/gearbox.json
+
+
+# 3. Set up env variables.
+ARG VERSION="7.0.33"
+MAINTAINER Gearbox Team <team@gearbox.works>
+ENV GEARBOX_CONTAINER_NAME "docker-php"
+ENV GEARBOX_CONTAINER_VERSION $VERSION
+ENV GEARBOX_CONTAINER_URL "http://php.net/get/php-$VERSION.tar.gz/from/this/mirror"
+# ENV GEARBOX_CONTAINER_URL "https://github.com/php/php-src/archive/php-$VERSION.tar.gz"
+ENV GEARBOX_CONTAINER_MD5 ""
+ENV GEARBOX_CONTAINER_ROOT "/"
+
+
+# 4. Run the build-base-php.sh script to set everything up.
+RUN /bin/sh /build/build-base-php.sh
+
+
+# 5. Load Gearbox default container.
+FROM gearboxworks/gearbox-base:alpine-3.7
+
+
+# 6. Copy the tarball generated from the previous layer to this new layer.
+COPY --from=php-base /build/output/php.tar.gz /build/output/php.tar.gz
+
+
+# 7. Set up env variables.
+MAINTAINER Gearbox Team <team@gearbox.works>
+
+
+# 8. Copy the build directory to the layer.
+COPY build /build
+COPY gearbox.json /build/gearbox.json
+
+
+# 9. Install tarball and other depends.
+RUN /bin/sh /build/build-php.sh
+
+
+# 10. Expose ports.
+EXPOSE 22 9000 9970
+
+
+# 11. Set default command to exec.
+# USER gearbox
+WORKDIR /project/www
+# ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
+CMD ["/usr/sbin/php-fpm", "-F"]
+

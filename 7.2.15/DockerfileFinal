@@ -1,0 +1,47 @@
+# Here's the go. We are going to generate a PHP base package first which contains a full PHP install.
+# This is then used by DockerfileRuntime OR DockerfileTarball to generate the real runtime PHP container.
+# We do this to avoid having to rebuild PHP completely if we have only minor changes to be made to the PHP container.
+# Saves time!
+ARG VERSION="7.2.15"
+
+
+# 1. First reference the php-base image.
+FROM gearboxworks/php-base:$VERSION as php-base
+
+
+# 2. Generate a PHP tarball from /usr/local
+RUN mkdir -p /build/output && tar zcvf /build/output/php.tar.gz /usr/local
+
+
+# 3. Load Gearbox default container.
+FROM gearboxworks/gearbox-base:alpine-3.8
+
+
+# 4. Copy the tarball generated from the previous layer to this new layer.
+COPY --from=php-base /build/output/php.tar.gz /build/output/php.tar.gz
+
+
+# 5. Set up env variables.
+ARG VERSION="7.2.15"
+MAINTAINER Gearbox Team <team@gearbox.works>
+
+
+# 6. Copy the build directory to the layer.
+COPY build /build
+COPY gearbox.json /build/gearbox.json
+
+
+# 7. Install tarball and other depends.
+RUN /bin/sh /build/build-php.sh
+
+
+# 8. Expose ports.
+EXPOSE 22 9000 9970
+
+
+# 9. Set default command to exec.
+# USER gearbox
+WORKDIR /project/www
+# ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
+CMD ["/usr/local/sbin/php-fpm", "-F"]
+
